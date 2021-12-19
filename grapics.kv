@@ -1,0 +1,30 @@
+WindowManager:
+    StartScreen:
+    MainScreen:
+
+<StartScreen>:  
+    Label:
+        pos: 0, -100
+        text: "press to start"
+
+    Button:
+        size: root.size
+        opacity: 0
+        on_release:
+            root.manager.transition.duration = '0'#fyfy
+            app.root.current = "mainScreen"
+            app.runApp()
+
+<MainScreen>:
+    name: "mainScreen"
+    Simulator:
+        id: sim
+        Car:
+            id: car
+            source: "car.png"
+            size: self.xSize/2, self.ySize/2
+            pos: self.xPos - self.xSize/2, self.yPos - self.ySize/2
+            canvas.before:
+                PushMatrix:
+            canvas.after: 
+                PopMatrix:
