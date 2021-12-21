@@ -19,12 +19,18 @@ WindowManager:
     name: "mainScreen"
     Simulator:
         id: sim
+        Image:
+            source: 'track.png'
         Car:
             id: car
-            source: "car.png"
-            size: self.xSize/2, self.ySize/2
+            source: 'car.png'
+            size_hint: None, None
+            size: self.xSize, self.ySize
             pos: self.xPos - self.xSize/2, self.yPos - self.ySize/2
             canvas.before:
                 PushMatrix:
-            canvas.after: 
+                Rotate:
+                    angle: self.angle
+                    origin: self.center
+            canvas.after:
                 PopMatrix:

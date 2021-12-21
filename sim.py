@@ -1,4 +1,4 @@
-from modules import keyboardInput, posCalc
+from modules import keyboardInput, posCalc, newton
 
 import kivy
 from kivy.app import App
@@ -8,13 +8,13 @@ from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.clock import Clock
 from kivy.config import Config
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.properties import NumericProperty, ListProperty
+from kivy.core.window import Window
+import numpy as np
 
-#from widgets.object.object import Object
-
-Config.set('graphics', 'height', '812')
-Config.set('graphics', 'width', '375')
+Window.fullscreen = 'auto'
 
 class WindowManager(ScreenManager):
     pass
@@ -32,16 +32,21 @@ class Car(Image):
     yVel = NumericProperty(0)
     xPos = NumericProperty(100)
     yPos = NumericProperty(100)
-    xSize = NumericProperty(30)
-    ySize = NumericProperty(30)
-    color = ListProperty([0,0,1,1])
+    xSize = NumericProperty(75)#prolly dont need 2. idk. works as it sholud like this
+    ySize = NumericProperty(75)
+    vel = NumericProperty(0)
+    angle = NumericProperty(90)#deg
     #constantc
-    mass = NumericProperty(700)
-    enginePower = 10 #
-    breakPower = 20
+    turnRadius = NumericProperty(6)#M
+    turn = NumericProperty(0)
+    mass = NumericProperty(700)#kg
+    enginePower = 5 #hp
+    breakPower = 10 #in G's maby idk
 
 class Simulator(FloatLayout):
     SELFBREAK = NumericProperty(1.01)
+    ASPHALTGRIP = NumericProperty(0)
+    METER = NumericProperty(15)# pixcels in a meter
 
 kv = Builder.load_file("grapics.kv")
 
@@ -53,30 +58,40 @@ class GUI(App):
         self.car = kv.get_screen("mainScreen").ids.car
         self.sim = kv.get_screen("mainScreen").ids.sim
 
-        self.keyboard = [False, False, False, False]
+        self.keyboard = [False, False, False, False] #keyboard inputs[up, down, left, right]
+        self.ct = 0 #global cycletime var
 
     def cycle(self, readCYCLETIME):
         self.runTime += readCYCLETIME
+        self.CT = readCYCLETIME
 
         #read inputs
         self.keyboard = keyboardInput()#get keyboard input
 
-        #vel calc
+        #temp controls
         if self.keyboard[0]:
-            self.car.yVel += self.car.enginePower
-        elif self.keyboard[1]:
-            if self.car.yVel > 0:
-                self.car.yVel -= self.car.breakPower
+            self.car.vel += (newton(self.car.enginePower) / self.car.mass) * self.sim.METER
+        if self.keyboard[1]:
+            if self.car.vel > 0:
+                self.car.vel -= (newton(self.car.breakPower) /self.car.mass) * self.sim.METER
             else:
-                self.car.yVel = -100
-            
-        else:
-            self.car.yVel = self.car.yVel/ self.sim.SELFBREAK
-
-
-        #uptdate outputs
-        self.car.yPos = self.car.yPos + self.car.yVel * readCYCLETIME
-
+                self.car.vel = -100#ryggehastight
+        if self.keyboard[2]:
+            self.car.angle += 5
+        if self.keyboard[3]:
+            self.car.angle -= 5 
+       
+        #uptdate pos. takes vel and angle
+        self.updatePos()
+    
+    def updatePos(self):
+        #calc x and y-vel based on vel and angle
+        self.car.yVel = int(np.sin(np.radians(self.car.angle)) * self.car.vel)
+        self.car.xVel = int(np.cos(np.radians(self.car.angle)) * self.car.vel)
+        
+        #update pos
+        self.car.yPos += self.car.yVel * self.CT
+        self.car.xPos += self.car.xVel * self.CT
 
     #runns cycle
     def runApp(self):
