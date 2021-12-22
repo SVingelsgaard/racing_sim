@@ -15,7 +15,6 @@ def keyboardInput():
         right = True
     return [up, down, left, right]
     
-def posCalc(pos, vel, timePassed):
-    return(pos + vel * timePassed)
+
 def newton(hp):
     return(hp * 735.49875)

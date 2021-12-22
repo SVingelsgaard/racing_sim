@@ -1,4 +1,4 @@
-from modules import keyboardInput, posCalc, newton
+from modules import keyboardInput, newton
 
 import kivy
 from kivy.app import App
@@ -28,25 +28,28 @@ class MainScreen(Screen):
 #own shit
 class Car(Image):
     #physics/grapics
-    xVel = NumericProperty(0)
-    yVel = NumericProperty(0)
+    xVel = NumericProperty(0)#m/s
+    yVel = NumericProperty(0)#m/s
     xPos = NumericProperty(100)
     yPos = NumericProperty(100)
     xSize = NumericProperty(75)#prolly dont need 2. idk. works as it sholud like this
     ySize = NumericProperty(75)
-    vel = NumericProperty(0)
+    vel = NumericProperty(0)#m/s
     angle = NumericProperty(90)#deg
-    #constantc
-    turnRadius = NumericProperty(6)#M
-    turn = NumericProperty(0)
+    turn = NumericProperty(0)#deg
+    turnCircRef = NumericProperty(0.0)#m
+    #mecanical constants
+    axelToAxel = NumericProperty(3.7)#m. from rare 'aksling' to front 'aksling'
+    turnRadius = NumericProperty(6.0)#m
+    #variable constants. 
     mass = NumericProperty(700)#kg
-    enginePower = 5 #hp
-    breakPower = 10 #in G's maby idk
+    enginePower = 160 #hp
+    breakPower = 200 #in G's maby idk
 
 class Simulator(FloatLayout):
     SELFBREAK = NumericProperty(1.01)
     ASPHALTGRIP = NumericProperty(0)
-    METER = NumericProperty(15)# pixcels in a meter
+    METER = NumericProperty(10)# pixcels in a meter
 
 kv = Builder.load_file("grapics.kv")
 
@@ -70,25 +73,46 @@ class GUI(App):
 
         #temp controls
         if self.keyboard[0]:
-            self.car.vel += (newton(self.car.enginePower) / self.car.mass) * self.sim.METER
+            self.car.vel += (newton(self.car.enginePower) / self.car.mass) / self.sim.METER
         if self.keyboard[1]:
             if self.car.vel > 0:
-                self.car.vel -= (newton(self.car.breakPower) /self.car.mass) * self.sim.METER
+                self.car.vel -= (newton(self.car.breakPower) /self.car.mass) / self.sim.METER
             else:
                 self.car.vel = -100#ryggehastight
-        if self.keyboard[2]:
+        '''if self.keyboard[2]:
             self.car.angle += 5
         if self.keyboard[3]:
-            self.car.angle -= 5 
-       
-        #uptdate pos. takes vel and angle
-        self.updatePos()
-    
-    def updatePos(self):
-        #calc x and y-vel based on vel and angle
+            self.car.angle -= 5'''
+
+        self.carAngle()
+        self.calcVel()#calc x and y-vel, takes vel and angle
+        self.updatePos()#uptdate pos. takes vel
+        
+
+    def carAngle(self):
+        if self.keyboard[2]:
+            self.car.turn = 30
+        if self.keyboard[3]:
+            self.car.turn  = -30 #or 330
+        else:
+            self.car.turn = 0
+        self.car.turnCircRef = ((np.arcsin(np.radians(self.car.turn))/self.car.axelToAxel) * 2 * np.pi)
+
+
+
+
+        print(x)#self.car.turnCircRef)
+
+
+
+        self.car.angle = int((self.car.turnCircRef/360) * self.car.vel*self.CT)
+        #print(self.car.angle)
+    def calcVel(self):
+        #calc x and y-vel based on vel and angle. this one will have lots of shit i think
         self.car.yVel = int(np.sin(np.radians(self.car.angle)) * self.car.vel)
         self.car.xVel = int(np.cos(np.radians(self.car.angle)) * self.car.vel)
-        
+    
+    def updatePos(self):
         #update pos
         self.car.yPos += self.car.yVel * self.CT
         self.car.xPos += self.car.xVel * self.CT

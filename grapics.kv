@@ -21,6 +21,15 @@ WindowManager:
         id: sim
         Image:
             source: 'track.png'
+        #creating canvas
+            canvas:
+                Color:
+                    rgba: 0, 0, 1, 1    # Blue
+        
+                # size and position of Canvas
+                Rectangle:
+                    pos: 100,100
+                    size: self.parent.METER, self.parent.METER
         Car:
             id: car
             source: 'car.png'
