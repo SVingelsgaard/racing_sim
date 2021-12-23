@@ -93,19 +93,16 @@ class GUI(App):
         if self.keyboard[2]:
             self.car.turn = 30
         if self.keyboard[3]:
-            self.car.turn  = -30 #or 330
-        else:
+            self.car.turn  = -30
+        if self.keyboard[2] == self.keyboard[3]:
             self.car.turn = 0
-        self.car.turnCircRef = ((np.arcsin(np.radians(self.car.turn))/self.car.axelToAxel) * 2 * np.pi)
+        self.car.turnCircRef = float(self.car.axelToAxel /(np.sin(np.radians((self.car.turn)))) * 2 * np.pi)
+
+        print(self.car.turnCircRef)
 
 
 
-
-        print(x)#self.car.turnCircRef)
-
-
-
-        self.car.angle = int((self.car.turnCircRef/360) * self.car.vel*self.CT)
+        #self.car.angle = int((self.car.turnCircRef/360) * self.car.vel*self.CT)
         #print(self.car.angle)
     def calcVel(self):
         #calc x and y-vel based on vel and angle. this one will have lots of shit i think
