@@ -18,3 +18,13 @@ def keyboardInput():
 
 def newton(hp):
     return(hp * 735.49875)
+
+
+def clamp(val, clamp):
+    if val > clamp:
+        out = clamp
+    elif val < -clamp:
+        out = -clamp
+    else:
+        out = val
+    return out

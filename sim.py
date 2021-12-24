@@ -1,4 +1,4 @@
-from modules import keyboardInput, newton
+from modules import keyboardInput, newton, clamp
 
 import kivy
 from kivy.app import App
@@ -38,10 +38,9 @@ class Car(Image):
     angle = NumericProperty(90)#deg
     turn = NumericProperty(0)#deg
     turnCircRef = NumericProperty(0.0)#m
-    #mecanical constants
+    #constants
     axelToAxel = NumericProperty(3.7)#m. from rare 'aksling' to front 'aksling'
-    turnRadius = NumericProperty(6.0)#m
-    #variable constants. 
+    turnRadius = NumericProperty(6.4)#m
     mass = NumericProperty(700)#kg
     enginePower = 160 #hp
     breakPower = 200 #in G's maby idk
@@ -90,20 +89,22 @@ class GUI(App):
         
 
     def carAngle(self):
+        #temp steering inputs
         if self.keyboard[2]:
-            self.car.turn = 30
+            self.car.turn = 35
         if self.keyboard[3]:
-            self.car.turn  = -30
+            self.car.turn  = -35
         if self.keyboard[2] == self.keyboard[3]:
             self.car.turn = 0
+
+        #clampin turn to max turnradius. trig btw
+        self.car.turn = float(clamp(self.car.turn, np.degrees(np.arctan((self.car.axelToAxel/self.car.turnRadius)))))
+
         self.car.turnCircRef = float(self.car.axelToAxel /(np.sin(np.radians((self.car.turn)))) * 2 * np.pi)
 
-        print(self.car.turnCircRef)
+        if self.car.turn != 0:
+            self.car.angle += ((self.car.turnCircRef/360) * self.car.vel)*0.3 #* self.CT
 
-
-
-        #self.car.angle = int((self.car.turnCircRef/360) * self.car.vel*self.CT)
-        #print(self.car.angle)
     def calcVel(self):
         #calc x and y-vel based on vel and angle. this one will have lots of shit i think
         self.car.yVel = int(np.sin(np.radians(self.car.angle)) * self.car.vel)
