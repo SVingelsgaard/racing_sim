@@ -35,7 +35,7 @@ WindowManager:
             source: 'car.png'
             size_hint: None, None
             size: self.xSize, self.ySize
-            pos: self.xPos - self.xSize/2, self.yPos - self.ySize/2
+            pos: (self.xPos - self.xSize/2), (self.yPos - self.ySize/2)
             canvas.before:
                 PushMatrix:
                 Rotate:

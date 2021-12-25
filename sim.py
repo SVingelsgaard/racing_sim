@@ -30,10 +30,10 @@ class Car(Image):
     #physics/grapics
     xVel = NumericProperty(0)#m/s
     yVel = NumericProperty(0)#m/s
-    xPos = NumericProperty(100)
-    yPos = NumericProperty(100)
+    xPos = NumericProperty(100)#m
+    yPos = NumericProperty(100)#m
     xSize = NumericProperty(75)#prolly dont need 2. idk. works as it sholud like this
-    ySize = NumericProperty(75)
+    ySize = NumericProperty(75)#px
     vel = NumericProperty(0)#m/s
     angle = NumericProperty(90)#deg
     turn = NumericProperty(0)#deg
@@ -48,7 +48,7 @@ class Car(Image):
 class Simulator(FloatLayout):
     SELFBREAK = NumericProperty(1.01)
     ASPHALTGRIP = NumericProperty(0)
-    METER = NumericProperty(10)# pixcels in a meter
+    METER = NumericProperty(10)# pixels in a meter
 
 kv = Builder.load_file("grapics.kv")
 
@@ -61,7 +61,7 @@ class GUI(App):
         self.sim = kv.get_screen("mainScreen").ids.sim
 
         self.keyboard = [False, False, False, False] #keyboard inputs[up, down, left, right]
-        self.ct = 0 #global cycletime var
+        self.CT = 0 #global cycletime var
 
     def cycle(self, readCYCLETIME):
         self.runTime += readCYCLETIME
@@ -72,7 +72,7 @@ class GUI(App):
 
         #temp controls
         if self.keyboard[0]:
-            self.car.vel += (newton(self.car.enginePower) / self.car.mass) / self.sim.METER
+            self.car.vel = 1# += (newton(self.car.enginePower) / self.car.mass) / self.sim.METER
         if self.keyboard[1]:
             if self.car.vel > 0:
                 self.car.vel -= (newton(self.car.breakPower) /self.car.mass) / self.sim.METER
@@ -89,6 +89,8 @@ class GUI(App):
         
 
     def carAngle(self):
+        #takes turn angle and 
+
         #temp steering inputs
         if self.keyboard[2]:
             self.car.turn = 35
@@ -103,7 +105,8 @@ class GUI(App):
         self.car.turnCircRef = float(self.car.axelToAxel /(np.sin(np.radians((self.car.turn)))) * 2 * np.pi)
 
         if self.car.turn != 0:
-            self.car.angle += ((self.car.turnCircRef/360) * self.car.vel)*0.3 #* self.CT
+            self.car.angle += ((self.car.turnCircRef/360) * self.car.vel* self.CT)
+        print( ((self.car.turnCircRef/360) * self.car.vel* self.CT))
 
     def calcVel(self):
         #calc x and y-vel based on vel and angle. this one will have lots of shit i think
