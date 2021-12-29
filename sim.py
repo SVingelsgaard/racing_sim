@@ -38,6 +38,19 @@ class Car(Image):
     angle = NumericProperty(90)#deg
     turn = 0 #deg
     turnCircRef = 0.0#m
+    frWeight = 0 #newton
+    flWeight = 0
+    brWeight = 0
+    blWeight = 0
+    frMaxFriction = 0#newton
+    flMaxFriction = 0
+    brMaxFriction = 0
+    blMaxFriction = 0
+    frFriction = 0#newton
+    flFriction = 0
+    brFriction = 0
+    blFriction = 0
+
     latGs = 0 #
     lonGs = 0 #for/backwards
     vertGs = 1 #downwards
@@ -50,9 +63,10 @@ class Car(Image):
     breakPower = 200 #in HP at the momen. idfk
 
 class Simulator(FloatLayout):
-    SELFBREAK = NumericProperty(1.01)
-    ASPHALTGRIP = NumericProperty(0)
+    SELFBREAK = 1.01
+    ASPHALTFRICTION = 0.7 #friction at dry asphalt. donno enhet
     METER = NumericProperty(10)# pixels in a meter
+    g = 9.81
 
 kv = Builder.load_file("grapics.kv")
 
@@ -90,13 +104,25 @@ class GUI(App):
         if self.keyboard[2] == self.keyboard[3]:
             self.car.turn = 0
 
+        self.calcWeelWeight()
+        self.calcWeelMaxFriction()
         self.carAngle()#calc carangel based on wheel angle and vel
         self.calcVel()#calc x and y-vel, takes vel and angle
         self.updatePos()#uptdate pos. takes vel
 
     def calcWeelWeight(self):
+        #quickfix
+        self.car.frWeight = newton(self.car.mass / 4)
+        self.car.flWeight = newton(self.car.mass / 4)
+        self.car.brWeight = newton(self.car.mass / 4)
+        self.car.blWeight = newton(self.car.mass / 4)
+
+    def calcWeelMaxFriction(self):
+        self.car.frMaxFriction = self.car.frWeight * self.sim.ASPHALTFRICTION
+
+    def calcWeelFriction(self):
         pass
-    
+
     def calcGForce(self):#idk
         pass
 
