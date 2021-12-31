@@ -55,6 +55,7 @@ class Car(Image):
     lonGs = 0 #for/backwards
     vertGs = 1 #downwards
 
+
     #constants
     axelToAxel = 3.7 #m. from rare 'aksling' to front 'aksling'
     turnRadius = 8.4 #m
@@ -119,9 +120,16 @@ class GUI(App):
 
     def calcWeelMaxFriction(self):
         self.car.frMaxFriction = self.car.frWeight * self.sim.ASPHALTFRICTION
+        self.car.flMaxFriction = self.car.flWeight * self.sim.ASPHALTFRICTION
+        self.car.brMaxFriction = self.car.brWeight * self.sim.ASPHALTFRICTION
+        self.car.blMaxFriction = self.car.blWeight * self.sim.ASPHALTFRICTION
+        print(self.car.blMaxFriction)
 
     def calcWeelFriction(self):
-        pass
+        self.car.frFriction = 0#newton
+        self.car.flFriction = 0
+        self.car.brFriction = self.
+        self.car.blFriction = 0
 
     def calcGForce(self):#idk
         pass
